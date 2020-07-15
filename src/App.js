@@ -1,25 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch
+} from 'react-router-dom';
+import LoginPage from './pages/Login';
+import ProfilePage from './pages/Profile';
 
 function App() {
+  const [userId, setUserId] = useState('');
+  const [name, setName] = useState({});
+  const [error, setError] = useState(null);
+  const [authenticated, setAuthenticated] = useState(false);
+  var url = "http://localhost:8000";
+  useEffect(() => {
+    fetch(`${url}/auth/checkLoggedIn`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Credentials": true
+      }
+    }).then(response => {
+      if (response.status === 200) return response.json();
+      throw new Error("failed to authenticate user");
+    }).then(responseJSON => {
+      setAuthenticated(true);
+      setUserId(responseJSON.user._id);
+      setName(responseJSON.user.name);
+    }).catch(err => {
+      setAuthenticated(false);
+      setError("Failed to authenticate user");
+      console.log(error);
+    });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch >
+      <Route path="/login" render={(props) => (
+          <LoginPage {...props} url={url} user={{ name: name, id: userId, }} authenticated={authenticated} />
+        )} />
+        <Route path="/profile" render={(props) => (
+          <ProfilePage {...props} url={url} user={{ name: name, id: userId, }} authenticated={authenticated} />
+        )} />
+      </Switch>
+    </Router>
   );
 }
 
