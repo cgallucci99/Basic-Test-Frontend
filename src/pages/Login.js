@@ -5,6 +5,9 @@ const LoginPage = ({ url, user, authenticated}) => {
     const loginGoog = () => {
         window.open(`${url}/auth/google`, "_self");
     }
+	const loginFacebook = () => {
+		window.open(`${url}/auth/facebook`, '_self');
+}
     const login = (e) => {
         e.preventDefault();
         // const data = new FormData(e.target);
@@ -43,6 +46,7 @@ const LoginPage = ({ url, user, authenticated}) => {
                 <button type='submit'>Submit</button>
             </form>
             <button onClick={loginGoog}>Google</button>
+						<button onClick={loginFacebook}>Facebook</button>
         </>
     )
 }
